@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Stock Hawk</string>
+
+    <string name="pref_stocks_initialized_key" translatable="false">initialized</string>
+    <string name="pref_stocks_key" translatable="false">stocks</string>
+
+    <string name="pref_display_mode_key" translatable="false">displayMode</string>
+    <string name="pref_display_mode_default" translatable="false">@string/pref_display_mode_percentage_key</string>
+
+    <string name="pref_display_mode_absolute_key" translatable="false">absolute</string>
+    <string name="pref_display_mode_percentage_key" translatable="false">percentage</string>
+
+    <!-- symbols name setup -->
+    <string name="default_stocks_yahoo" translatable="false">YHOO</string>
+    <string name="default_stocks_apple" translatable="false">AAPL</string>
+    <string name="default_stocks_microsoft" translatable="false">MSFT</string>
+    <string name="default_stocks_facebook" translatable="false">FB</string>
+
+
+    <string name="action_change_units" translatable="false">@string/pref_display_mode_key</string>
+
+    <!-- add stock title of show dialog -->
+    <string name="dialog_title">Add Stock</string>
+
+    <!-- symbol hint of stock dialog to add it -->
+    <string name="dialog_hint">Symbol (e.g. GOOG)</string>
+
+    <!-- cancel stock dialog -->
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- add stock dialog -->
+    <string name="dialog_add">Add</string>
+
+    <!-- floating button to start stock dialog -->
+    <string name="show_dialog">Show stock dialog</string>
+
+    <!-- no network messages-->
+    <string name="error_no_network">No network connectivity! Will load stock cursor when the network is available.</string>
+    <string name="error_no_stocks">No stocks added! Hit the floating action button to add one.</string>
+    <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
+    <string name="toast_no_connectivity">Will refresh when network available.</string>
+
+</resources>
