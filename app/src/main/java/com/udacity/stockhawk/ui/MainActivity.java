@@ -1,6 +1,7 @@
 package com.udacity.stockhawk.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -87,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onClick(View view, int position) {
                 Toast.makeText(MainActivity.this, "Single Click: " + adapter.getSymbolAtPosition(position), Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                startActivity(i);
             }
 
             @Override
