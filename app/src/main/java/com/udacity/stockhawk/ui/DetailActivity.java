@@ -4,9 +4,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.udacity.stockhawk.R;
 
 import java.util.ArrayList;
@@ -22,27 +27,54 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         LineChart lineChart = (LineChart) findViewById(R.id.chart);
+        List<Entry> valsComp1 = new ArrayList<Entry>();
+        List<Entry> valsComp2 = new ArrayList<Entry>();
+
                 // creating list of entry<br />
-        ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(4f, 0));
-        entries.add(new Entry(8f, 1));
-        entries.add(new Entry(6f, 2));
-        entries.add(new Entry(2f, 3));
-        entries.add(new Entry(18f, 4));
-        entries.add(new Entry(9f, 5));
+        Entry c1e1 = new Entry(0f, 100000f); // 0 == quarter 1
+        valsComp1.add(c1e1);
+        Entry c1e2 = new Entry(1f, 140000f); // 1 == quarter 2 ...
+        valsComp1.add(c1e2);
+        valsComp1.add(new Entry(2f, 120000f));
+        valsComp1.add(new Entry(3f, 140000f));
 
-        ArrayList<String> labels = new ArrayList<>();
-        labels.add("January");
-        labels.add("January");
-        labels.add("January");
-        labels.add("January");
+        Entry c2e1 = new Entry(0f, 130000f); // 0 == quarter 1
+        valsComp2.add(c2e1);
+        Entry c2e2 = new Entry(1f, 115000f); // 1 == quarter 2 ...
+        valsComp2.add(c2e2);
+
+        valsComp2.add(new Entry(2f, 90000f));
+        valsComp2.add(new Entry(3f, 105000f));
 
 
+        LineDataSet setComp1 = new LineDataSet(valsComp1, "Company 1");
+        setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
+        LineDataSet setComp2 = new LineDataSet(valsComp2, "Company 2");
+        setComp2.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-        LineDataSet dataSet = new LineDataSet(entries, "Label");
+        List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+        dataSets.add(setComp1);
+        dataSets.add(setComp2);
 
-        LineData lineData = new LineData(dataSet);
-        lineChart.setData(lineData);
-        lineChart.invalidate();
+        LineData data = new LineData(dataSets);
+        lineChart.setData(data);
+
+        // the labels that should be drawn on the XAxis
+        final String[] quarters = new String[] { "Q1", "Q2", "Q3", "Q4" };
+
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return quarters[(int) value];
+            }
+
+        };
+
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
+        xAxis.setValueFormatter(formatter);
+
+        lineChart.invalidate(); // refresh
     }
 }
