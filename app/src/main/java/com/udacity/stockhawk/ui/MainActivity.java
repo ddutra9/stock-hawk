@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         StockAdapter.StockAdapterOnClickHandler {
 
     private static final int STOCK_LOADER = 0;
+    public static final String STOCK_SYMBOL = "STOCK_SYMBOL";
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.recycler_view)
     RecyclerView stockRecyclerView;
@@ -89,12 +90,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(View view, int position) {
                 Toast.makeText(MainActivity.this, "Single Click: " + adapter.getSymbolAtPosition(position), Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                i.putExtra(STOCK_SYMBOL, adapter.getSymbolAtPosition(position));
                 startActivity(i);
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                Toast.makeText(MainActivity.this, "Long press on position: " + position, Toast.LENGTH_LONG).show();
+
             }
         }));
     }
