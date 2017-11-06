@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -20,6 +22,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.google.common.collect.Lists;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
@@ -28,12 +31,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.R.attr.entries;
+import static android.R.color.white;
 
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -60,8 +66,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         getSupportLoaderManager().initLoader(STOCK_CHART_LOADER, null, this);
     }
 
-    private List<ILineDataSet> populateChart(String symbol, Cursor data) throws ParseException {
-        List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+    private void populateChart(String symbol, Cursor data, LineChart lineChart) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         while (data.moveToNext()) {
@@ -77,12 +82,16 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                     break;
             }
 
-            LineDataSet setComp1 = new LineDataSet(vals, symbol);
-            setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
-            dataSets.add(setComp1);
+            LineDataSet dataSet = new LineDataSet(Lists.reverse(vals), symbol);
+//            dataSet.setColor(white);
+            dataSet.setLineWidth(2f);
+            dataSet.setDrawHighlightIndicators(false);
+//            dataSet.setCircleColor(white);
+//            dataSet.setHighLightColor(white);
+            dataSet.setDrawValues(false);
+            LineData lineData = new LineData(dataSet);
+            lineChart.setData(lineData);
         }
-
-        return dataSets;
     }
 
     @Override
@@ -95,30 +104,64 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        LineData lineData = null;
         try {
-            lineData = new LineData(populateChart(symbol, data));
+            populateChart(symbol, data, lineChart);
         } catch (ParseException e) {
             Log.e(TAG, "error no parse", e);
         }
-        lineChart.setData(lineData);
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+        final SimpleDateFormat sdf = new SimpleDateFormat("dd");
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
-
-            private int i = 0;
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                Log.d(TAG, "date: " + sdf.format(new Date((long)value)));
-                return "Q" + i++;
+                String label = sdf.format(new Date((long)value));
+                Log.d(TAG, "date: " + label);
+                return label;
+            }
+
+        };
+
+        IAxisValueFormatter formatterY = new IAxisValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                Log.d(TAG, "date: " + value);
+                return "$" + value;
             }
 
         };
 
         XAxis xAxis = lineChart.getXAxis();
-        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
+        xAxis.setDrawGridLines(false);
+//        xAxis.setAxisLineColor(white);
+        xAxis.setAxisLineWidth(1.5f);
+//        xAxis.setTextColor(white);
+        xAxis.setTextSize(12f);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setValueFormatter(formatter);
+
+        YAxis yAxisRight = lineChart.getAxisRight();
+        yAxisRight.setEnabled(false);
+
+        YAxis yAxis = lineChart.getAxisLeft();
+        yAxis.setValueFormatter(formatterY);
+        yAxis.setDrawGridLines(false);
+//        yAxis.setAxisLineColor(white);
+        yAxis.setAxisLineWidth(1.5f);
+//        yAxis.setTextColor(white);
+        yAxis.setTextSize(12f);
+
+        lineChart.setDragEnabled(false);
+        lineChart.setScaleEnabled(false);
+        lineChart.setDragDecelerationEnabled(false);
+        lineChart.setPinchZoom(false);
+        lineChart.setDoubleTapToZoomEnabled(false);
+        Description description = new Description();
+        description.setText(" ");
+        lineChart.setDescription(description);
+        lineChart.setExtraOffsets(10, 0, 0, 10);
+        lineChart.animateX(1500, Easing.EasingOption.Linear);
     }
 
     @Override
