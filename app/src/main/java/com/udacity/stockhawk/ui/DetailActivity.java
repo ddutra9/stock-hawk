@@ -104,64 +104,58 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        try {
-            populateChart(symbol, data, lineChart);
-        } catch (ParseException e) {
-            Log.e(TAG, "error no parse", e);
+//        List<Entry> valsComp1 = new ArrayList<Entry>();
+//        List<Entry> valsComp2 = new ArrayList<Entry>();
+//
+//        Entry c1e1 = new Entry(0f, 100000f); // 0 == quarter 1
+//        valsComp1.add(c1e1);
+//        Entry c1e2 = new Entry(1f, 140000f); // 1 == quarter 2 ...
+//        valsComp1.add(c1e2);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+        final List<String> quarters = new ArrayList<>();
+        while (data.moveToNext()) {
+            List<Entry> vals = new ArrayList<Entry>();
+
+            for (String s : data.getString(Contract.Quote.POSITION_HISTORY).split("\n")) {
+                String[] val = s.split(",");
+                Log.d(TAG, "val: " + Arrays.toString(val));
+                Entry entry = null;
+                try {
+                    entry = new Entry(quarters.size(), Float.parseFloat(val[1]));
+                    quarters.add(Integer.toString(sdf.parse(val[0]).getDay()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                vals.add(entry);
+
+                if(vals.size() == 4)
+                    break;
+            }
+
+            LineDataSet setComp1 = new LineDataSet(vals, symbol);
+            setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
+            dataSets.add(setComp1);
         }
 
-        final SimpleDateFormat sdf = new SimpleDateFormat("dd");
+        LineData lineData = new LineData(dataSets);
+        lineChart.setData(lineData);
+        lineChart.invalidate(); // refresh
+
+//        final String[] quarters = new String[] { "Q1", "Q2", "Q3", "Q4" };
+
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                String label = sdf.format(new Date((long)value));
-                Log.d(TAG, "date: " + label);
-                return label;
+                return quarters.get((int) value);
             }
-
-        };
-
-        IAxisValueFormatter formatterY = new IAxisValueFormatter() {
-
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                Log.d(TAG, "date: " + value);
-                return "$" + value;
-            }
-
         };
 
         XAxis xAxis = lineChart.getXAxis();
-        xAxis.setDrawGridLines(false);
-//        xAxis.setAxisLineColor(white);
-        xAxis.setAxisLineWidth(1.5f);
-//        xAxis.setTextColor(white);
-        xAxis.setTextSize(12f);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
         xAxis.setValueFormatter(formatter);
-
-        YAxis yAxisRight = lineChart.getAxisRight();
-        yAxisRight.setEnabled(false);
-
-        YAxis yAxis = lineChart.getAxisLeft();
-        yAxis.setValueFormatter(formatterY);
-        yAxis.setDrawGridLines(false);
-//        yAxis.setAxisLineColor(white);
-        yAxis.setAxisLineWidth(1.5f);
-//        yAxis.setTextColor(white);
-        yAxis.setTextSize(12f);
-
-        lineChart.setDragEnabled(false);
-        lineChart.setScaleEnabled(false);
-        lineChart.setDragDecelerationEnabled(false);
-        lineChart.setPinchZoom(false);
-        lineChart.setDoubleTapToZoomEnabled(false);
-        Description description = new Description();
-        description.setText(" ");
-        lineChart.setDescription(description);
-        lineChart.setExtraOffsets(10, 0, 0, 10);
-        lineChart.animateX(1500, Easing.EasingOption.Linear);
     }
 
     @Override
