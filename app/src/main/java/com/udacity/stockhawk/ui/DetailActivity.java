@@ -26,13 +26,18 @@ import com.google.common.collect.Lists;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
+import org.threeten.bp.DayOfWeek;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -50,6 +55,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @BindView(R.id.chart)
     LineChart lineChart;
+    private int SELECTED_TIME = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,42 +120,43 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
-        final List<String> quarters = new ArrayList<>();
+        final Map<Integer, Long> mapDateXaxis = new HashMap<>();
         while (data.moveToNext()) {
-            List<Entry> vals = new ArrayList<Entry>();
 
-            for (String s : data.getString(Contract.Quote.POSITION_HISTORY).split("\n")) {
+            List<Entry> vals = new ArrayList<Entry>();
+            String[] history = data.getString(Contract.Quote.POSITION_HISTORY).split("\n");
+            for(int x = 0; x < SELECTED_TIME; x++){
+                String s = history[x];
                 String[] val = s.split(",");
                 Log.d(TAG, "val: " + Arrays.toString(val));
                 Entry entry = null;
                 try {
-                    entry = new Entry(quarters.size(), Float.parseFloat(val[1]));
-                    quarters.add(Integer.toString(sdf.parse(val[0]).getDay()));
+                    int key = SELECTED_TIME - (x + 1);
+                    mapDateXaxis.put(key, sdf.parse(val[0]).getTime());
+                    entry = new Entry(key, Float.parseFloat(val[1]));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 vals.add(entry);
-
-                if(vals.size() == 4)
-                    break;
             }
 
-            LineDataSet setComp1 = new LineDataSet(vals, symbol);
-            setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
+            LineDataSet setComp1 = new LineDataSet(Lists.reverse(vals), symbol);
+//            setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
             dataSets.add(setComp1);
         }
 
         LineData lineData = new LineData(dataSets);
         lineChart.setData(lineData);
-        lineChart.invalidate(); // refresh
 
 //        final String[] quarters = new String[] { "Q1", "Q2", "Q3", "Q4" };
 
+        final Calendar c = Calendar.getInstance();
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                return quarters.get((int) value);
+                c.setTimeInMillis(mapDateXaxis.get((int) value));
+                return new SimpleDateFormat("dd/MM/yyyy").format(c.getTime());
             }
         };
 
