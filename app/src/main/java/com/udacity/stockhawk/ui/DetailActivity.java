@@ -141,14 +141,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             }
 
             LineDataSet setComp1 = new LineDataSet(Lists.reverse(vals), symbol);
-//            setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
             dataSets.add(setComp1);
         }
 
         LineData lineData = new LineData(dataSets);
         lineChart.setData(lineData);
-
-//        final String[] quarters = new String[] { "Q1", "Q2", "Q3", "Q4" };
 
         final Calendar c = Calendar.getInstance();
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
@@ -161,7 +158,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         };
 
         XAxis xAxis = lineChart.getXAxis();
-        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
+        xAxis.setGranularity(1f); // é isso que fala quantassve aparece no eixo x
         xAxis.setValueFormatter(formatter);
     }
 
