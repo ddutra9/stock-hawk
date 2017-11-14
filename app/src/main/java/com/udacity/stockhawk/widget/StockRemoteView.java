@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
@@ -23,6 +24,7 @@ import android.widget.RemoteViewsService;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
+import com.udacity.stockhawk.ui.DetailActivity;
 import com.udacity.stockhawk.ui.MainActivity;
 
 import java.text.DecimalFormat;
@@ -91,19 +93,23 @@ public class StockRemoteView extends RemoteViewsService {
                 views.setTextViewText(R.id.price, dollarFormat.format(data.getFloat(Contract.Quote.POSITION_PRICE)));
 
                 float rawAbsoluteChange = data.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
-                float percentageChange = data.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
 
                 if (rawAbsoluteChange > 0) {
-                    views.setTextColor(R.id.change, ContextCompat.getColor(getBaseContext(), R.color.material_green_700));
+                    views.setInt(R.id.change, "setBackgroundColor",
+                            ContextCompat.getColor(getBaseContext(), R.color.material_green_700));
                 } else {
-                    views.setTextColor(R.id.change,ContextCompat.getColor(getBaseContext(), R.color.material_red_700));
+                    views.setInt(R.id.change, "setBackgroundColor",
+                            ContextCompat.getColor(getBaseContext(), R.color.material_red_700));
                 }
 
                 String change = dollarFormatWithPlus.format(rawAbsoluteChange);
                 views.setTextViewText(R.id.change, change);
 
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                views.setOnClickFillInIntent(R.id.widget, intent);
+                final Intent fillInIntent = new Intent();
+                final Bundle extras = new Bundle();
+                extras.putString(MainActivity.STOCK_SYMBOL, data.getString(Contract.Quote.POSITION_SYMBOL));
+                fillInIntent.putExtras(extras);
+                views.setOnClickFillInIntent(R.id.list_item_quote, fillInIntent);
 
                 return views;
             }

@@ -1,7 +1,5 @@
 <resources>
     <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="widget_stock_default_height">250dp</dimen>
-    <dimen name="widget_stock_min_resize_height">180dp</dimen>
-    <dimen name="widget_stock_min_resize_width">220dp</dimen>
-    <dimen name="widget_stock_default_width">180dp</dimen>
+    <dimen name="widget_stock_default_height">240dp</dimen>
+    <dimen name="widget_stock_default_width">300dp</dimen>
 </resources>
