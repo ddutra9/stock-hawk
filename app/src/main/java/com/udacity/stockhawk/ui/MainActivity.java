@@ -2,10 +2,12 @@ package com.udacity.stockhawk.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -33,7 +35,8 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener,
-        StockAdapter.StockAdapterOnClickHandler {
+        StockAdapter.StockAdapterOnClickHandler,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int STOCK_LOADER = 0;
     public static final String STOCK_SYMBOL = "STOCK_SYMBOL";
@@ -50,7 +53,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onClick(String symbol) {
-        Timber.d("Symbol clicked: %s", symbol);
+        Intent i = new Intent(MainActivity.this, DetailActivity.class);
+        i.putExtra(STOCK_SYMBOL, symbol);
+        startActivity(i);
     }
 
     @Override
@@ -85,20 +90,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         }).attachToRecyclerView(stockRecyclerView);
 
-        stockRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, stockRecyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                Toast.makeText(MainActivity.this, "Single Click: " + adapter.getSymbolAtPosition(position), Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                i.putExtra(STOCK_SYMBOL, adapter.getSymbolAtPosition(position));
-                startActivity(i);
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
+//        stockRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, stockRecyclerView, new RecyclerTouchListener.ClickListener() {
+//            @Override
+//            public void onClick(View view, int position) {
+//                Toast.makeText(MainActivity.this, "Single Click: " + adapter.getSymbolAtPosition(position), Toast.LENGTH_SHORT).show();
+//                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+//                i.putExtra(STOCK_SYMBOL, adapter.getSymbolAtPosition(position));
+//                startActivity(i);
+//            }
+//
+//            @Override
+//            public void onLongClick(View view, int position) {
+//
+//            }
+//        }));
     }
 
     private boolean networkUp() {
@@ -202,5 +207,46 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_stocks_status_key))) {
+            updateErrorView();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp.registerOnSharedPreferenceChangeListener(this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
+    private void updateErrorView() {
+        @QuoteSyncJob.StockStatus int status = QuoteSyncJob.getStockStatus(this);
+
+        String message = null;
+        switch (status) {
+            case QuoteSyncJob.STOCK_STATUS_INVALID:
+                break;
+
+            case QuoteSyncJob.STOCK_STATUS_OK:
+                break;
+
+            case QuoteSyncJob.STOCK_STATUS_SERVER_DOWN:
+            case QuoteSyncJob.STOCK_STATUS_SERVER_INVALID:
+            case QuoteSyncJob.STOCK_STATUS_UNKNOWN:
+                break;
+        }
+
+        swipeRefreshLayout.setRefreshing(false);
     }
 }
