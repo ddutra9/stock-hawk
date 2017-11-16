@@ -2,6 +2,7 @@ package com.udacity.stockhawk.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -33,7 +34,8 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener,
-        StockAdapter.StockAdapterOnClickHandler {
+        StockAdapter.StockAdapterOnClickHandler,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final int STOCK_LOADER = 0;
     public static final String STOCK_SYMBOL = "STOCK_SYMBOL";
@@ -202,5 +204,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
     }
 }
