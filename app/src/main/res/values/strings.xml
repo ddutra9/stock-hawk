@@ -42,5 +42,8 @@
     <string name="title_widget_stock_list">Preview list stock</string>
     <string name="error_message">Error message</string>
     <string name="pref_stocks_status_key">stock_status_key</string>
+    <string name="week_title">Week</string>
+    <string name="six_months_title">6 month</string>
+    <string name="one_year_title">1 year</string>
 
 </resources>

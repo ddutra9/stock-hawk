@@ -51,10 +51,10 @@ public final class QuoteSyncJob {
 
     private static final int ONE_OFF_ID = 2;
     public static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
-    private static final int PERIOD = 300000;
+    private static final int PERIOD = 1800000;
     private static final int INITIAL_BACKOFF = 10000;
     private static final int PERIODIC_ID = 1;
-    private static final int YEARS_OF_HISTORY = 2;
+    private static final int YEARS_OF_HISTORY = 1;
 
     private static final String QUANDL_ROOT = "https://www.quandl.com/api/v3/datasets/WIKI/";
 
@@ -137,10 +137,6 @@ public final class QuoteSyncJob {
                             String body = response.body().string();
                             JSONObject jsonObject = new JSONObject(body);
                             String stockSymbol = call.request().url().pathSegments().get(4).replace(".json", "");
-                            if(stockSymbol.equals("TESTE")){
-                                PrefUtils.removeStock(context, stockSymbol);
-                                setStockStatus(context, STOCK_STATUS_INVALID);
-                            }
                             ContentValues quotes = processStock(context, jsonObject.getJSONObject("dataset"), stockSymbol);
 
                             context.getContentResolver().insert(Contract.Quote.URI,quotes);

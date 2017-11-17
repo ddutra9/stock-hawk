@@ -1,11 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:elevation="3dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentTop="true"
+            app:elevation="0dp"
+            app:layout_scrollFlags="scroll"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        </android.support.v7.widget.Toolbar>
+
+        <android.support.v7.widget.GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:columnCount="3">
+
+            <TextView
+                android:id="@+id/stock_name_tv" />
+
+            <TextView
+                android:id="@+id/day_stock_hight_tv"/>
+
+            <android.support.v4.widget.Space
+                android:layout_height="0dp"
+                android:layout_marginBottom="16dp"
+                app:layout_columnSpan="3"
+                app:layout_columnWeight="1"/>
+
+            <TextView android:id="@+id/stock_symbol_tv"/>
+
+            <TextView android:id="@+id/day_stock_low_tv"/>
+
+            <android.support.v4.widget.Space
+                android:layout_height="0dp"
+                android:layout_marginBottom="16dp"
+                app:layout_columnSpan="3"
+                app:layout_columnWeight="1"/>
+
+            <TextView
+                android:id="@+id/stock_price_now_tv"/>
+
+        </android.support.v7.widget.GridLayout>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab_months"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="fixed"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/chart_vp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

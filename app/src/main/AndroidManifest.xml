@@ -23,6 +23,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.DetailActivity" android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:parentActivityName=".ui.MainActivity"></activity>
+
         <service
             android:name=".sync.QuoteIntentService"
             android:exported="false" />
@@ -37,8 +40,6 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <activity android:name=".ui.DetailActivity"></activity>
 
         <!-- widgets -->
         <receiver android:name=".widget.StockWidgetProvider" android:label="@string/title_widget_stock_list">

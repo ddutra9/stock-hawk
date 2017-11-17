@@ -1,22 +1,23 @@
 package com.udacity.stockhawk.ui;
 
-import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.database.Cursor;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -26,36 +27,41 @@ import com.google.common.collect.Lists;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
-import org.threeten.bp.DayOfWeek;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.R.attr.entries;
-import static android.R.color.white;
-
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    private static final int STOCK_CHART_LOADER = 0;
+    public static final int STOCK_CHART_LOADER = 0;
     private static final String TAG = DetailActivity.class.getSimpleName();
 
-    private String symbol;
+    public String symbol;
 
-    @BindView(R.id.chart)
-    LineChart lineChart;
-    private int SELECTED_TIME = 5;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.stock_name_tv)
+    TextView stockNameTV;
+    @BindView(R.id.day_stock_hight_tv)
+    TextView dayStockHightTV;
+    @BindView(R.id.stock_symbol_tv)
+    TextView stockSymbolTV;
+    @BindView(R.id.day_stock_low_tv)
+    TextView dayStockLowTV;
+    @BindView(R.id.stock_price_now_tv)
+    TextView stockPriceNowTV;
+    @BindView(R.id.chart_vp)
+    ViewPager chartVP;
+    @BindView(R.id.tab_months)
+    TabLayout tabMonths;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +69,52 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         if(savedInstanceState == null){
             symbol = getIntent().getStringExtra(MainActivity.STOCK_SYMBOL);
         } else {
             symbol = savedInstanceState.getString(MainActivity.STOCK_SYMBOL);
         }
 
+        tabMonths.setupWithViewPager(chartVP, true);
         getSupportLoaderManager().initLoader(STOCK_CHART_LOADER, null, this);
+        setupViewPager();
+    }
+
+    private void setupViewPager() {
+
+        Calendar c = Calendar.getInstance();
+
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        Bundle bundle = new Bundle();
+        DetailFragment monthlyStock = new DetailFragment();
+        c.add(Calendar.DATE, 7);
+        bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
+        monthlyStock.setArguments(bundle);
+
+        DetailFragment weeklyStock = new DetailFragment();
+        bundle = new Bundle();
+        c = Calendar.getInstance();
+        c.add(Calendar.MONTH, 3);
+        bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
+        weeklyStock.setArguments(bundle);
+
+        DetailFragment dailyStock = new DetailFragment();
+        bundle = new Bundle();
+        c = Calendar.getInstance();
+        c.add(Calendar.MONTH, 3);
+        bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
+        dailyStock.setArguments(bundle);
+
+        viewPagerAdapter.addFragment(dailyStock, getString(R.string.week_title));
+        viewPagerAdapter.addFragment(weeklyStock, getString(R.string.six_months_title));
+        viewPagerAdapter.addFragment(monthlyStock, getString(R.string.one_year_title));
+
+        chartVP.setAdapter(viewPagerAdapter);
+        chartVP.setOffscreenPageLimit(2);
     }
 
     private void populateChart(String symbol, Cursor data, LineChart lineChart) throws ParseException {
@@ -105,65 +150,48 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         return new CursorLoader(this,
                 Contract.Quote.makeUriForStock(symbol),
                 Contract.Quote.QUOTE_COLUMNS,
-                null, null, Contract.Quote.COLUMN_SYMBOL);
+                null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        List<Entry> valsComp1 = new ArrayList<Entry>();
-//        List<Entry> valsComp2 = new ArrayList<Entry>();
-//
-//        Entry c1e1 = new Entry(0f, 100000f); // 0 == quarter 1
-//        valsComp1.add(c1e1);
-//        Entry c1e2 = new Entry(1f, 140000f); // 1 == quarter 2 ...
-//        valsComp1.add(c1e2);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
-        final Map<Integer, Long> mapDateXaxis = new HashMap<>();
-        while (data.moveToNext()) {
-
-            List<Entry> vals = new ArrayList<Entry>();
-            String[] history = data.getString(Contract.Quote.POSITION_HISTORY).split("\n");
-            for(int x = 0; x < SELECTED_TIME; x++){
-                String s = history[x];
-                String[] val = s.split(",");
-                Log.d(TAG, "val: " + Arrays.toString(val));
-                Entry entry = null;
-                try {
-                    int key = SELECTED_TIME - (x + 1);
-                    mapDateXaxis.put(key, sdf.parse(val[0]).getTime());
-                    entry = new Entry(key, Float.parseFloat(val[1]));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                vals.add(entry);
-            }
-
-            LineDataSet setComp1 = new LineDataSet(Lists.reverse(vals), symbol);
-            dataSets.add(setComp1);
-        }
-
-        LineData lineData = new LineData(dataSets);
-        lineChart.setData(lineData);
-
-        final Calendar c = Calendar.getInstance();
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
-
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                c.setTimeInMillis(mapDateXaxis.get((int) value));
-                return new SimpleDateFormat("dd/MM/yyyy").format(c.getTime());
-            }
-        };
-
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setGranularity(1f); // é isso que fala quantassve aparece no eixo x
-        xAxis.setValueFormatter(formatter);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        lineChart.invalidate(); // refresh
+
+    }
+
+
+
+    public class ViewPagerAdapter extends FragmentPagerAdapter {
+
+        private final List<Fragment> fragments = new ArrayList<>();
+        private final List<String> titles = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return fragments.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return titles.get(position);
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            fragments.add(fragment);
+            titles.add(title);
+        }
     }
 }
