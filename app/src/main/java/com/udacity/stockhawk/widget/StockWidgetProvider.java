@@ -32,10 +32,18 @@ public class StockWidgetProvider extends AppWidgetProvider {
             Intent intent = new Intent(context, DetailActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+
             views.setRemoteAdapter(R.id.widget_list, new Intent(context, StockRemoteView.class));
 
+            // Set up collection items
+            Intent clickIntentTemplate = new Intent(context, DetailActivity.class);
+            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(clickIntentTemplate)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
+            views.setEmptyView(R.id.widget_list, R.id.widget_empty);
+
             appWidgetManager.updateAppWidget(appWidgetId, views);
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
         }
     }
 
