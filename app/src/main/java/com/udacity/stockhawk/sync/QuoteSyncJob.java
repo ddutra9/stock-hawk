@@ -142,7 +142,7 @@ public final class QuoteSyncJob {
                             context.getContentResolver().insert(Contract.Quote.URI,quotes);
                         } catch(JSONException ex){
                             Timber.e(ex, "Unknown Error");
-                            setStockStatus(context, STOCK_STATUS_UNKNOWN);
+                            setStockStatus(context, STOCK_STATUS_SERVER_INVALID);
                         }
                     }
                 });
@@ -185,9 +185,9 @@ public final class QuoteSyncJob {
 
     public static synchronized void syncImmediately(Context context) {
 
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+
         if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
             Intent nowIntent = new Intent(context, QuoteIntentService.class);
             context.startService(nowIntent);
@@ -203,8 +203,6 @@ public final class QuoteSyncJob {
             JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
             scheduler.schedule(builder.build());
-
-
         }
     }
 

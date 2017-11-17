@@ -236,15 +236,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String message = null;
         switch (status) {
             case QuoteSyncJob.STOCK_STATUS_INVALID:
+                message = getString(R.string.add_stock_invalid);
                 break;
 
-            case QuoteSyncJob.STOCK_STATUS_OK:
+            case QuoteSyncJob.STOCK_STATUS_SERVER_INVALID:
+                message = getString(R.string.stock_status_server_invalid);
                 break;
 
             case QuoteSyncJob.STOCK_STATUS_SERVER_DOWN:
-            case QuoteSyncJob.STOCK_STATUS_SERVER_INVALID:
-            case QuoteSyncJob.STOCK_STATUS_UNKNOWN:
+                message = getString(R.string.stock_status_server_down);
                 break;
+        }
+
+        if(message != null){
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
 
         swipeRefreshLayout.setRefreshing(false);
