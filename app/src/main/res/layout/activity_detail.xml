@@ -29,20 +29,7 @@
             app:columnCount="3">
 
             <TextView
-                android:id="@+id/stock_name_tv" />
-
-            <TextView
-                android:id="@+id/day_stock_hight_tv"/>
-
-            <android.support.v4.widget.Space
-                android:layout_height="0dp"
-                android:layout_marginBottom="16dp"
-                app:layout_columnSpan="3"
-                app:layout_columnWeight="1"/>
-
-            <TextView android:id="@+id/stock_symbol_tv"/>
-
-            <TextView android:id="@+id/day_stock_low_tv"/>
+                android:id="@+id/stock_symbol_tv" />
 
             <android.support.v4.widget.Space
                 android:layout_height="0dp"

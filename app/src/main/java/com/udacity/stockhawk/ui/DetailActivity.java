@@ -48,14 +48,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.stock_name_tv)
-    TextView stockNameTV;
-    @BindView(R.id.day_stock_hight_tv)
-    TextView dayStockHightTV;
     @BindView(R.id.stock_symbol_tv)
     TextView stockSymbolTV;
-    @BindView(R.id.day_stock_low_tv)
-    TextView dayStockLowTV;
     @BindView(R.id.stock_price_now_tv)
     TextView stockPriceNowTV;
     @BindView(R.id.chart_vp)
@@ -116,7 +110,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data.moveToFirst()) {
+            String symbol = data.getString(Contract.Quote.POSITION_SYMBOL);
+            Float price = data.getFloat(Contract.Quote.POSITION_PRICE);
+            Float absoluteChange = data.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
 
+
+        }
     }
 
     @Override
