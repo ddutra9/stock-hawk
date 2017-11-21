@@ -1,6 +1,7 @@
 package com.udacity.stockhawk.ui;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -83,7 +85,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     void populateChart(Cursor data){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
-        final Map<Integer, Long> mapDateXaxis = new HashMap<>();
+        Map<Integer, Long> mapDateXaxis = new HashMap<>();
         int days = getDiferenceDays();
 
         while (data.moveToNext()) {
@@ -105,26 +107,67 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 vals.add(entry);
             }
 
-            LineDataSet setComp1 = new LineDataSet(Lists.reverse(vals), symbol);
-            dataSets.add(setComp1);
+            LineDataSet lineDataSet = new LineDataSet(Lists.reverse(vals), symbol);
+
+            lineDataSet.setColor(Color.WHITE);
+            lineDataSet.setLineWidth(2f);
+            lineDataSet.setHighLightColor(Color.WHITE);
+            lineDataSet.setValueTextSize(10f);
+            lineDataSet.setValueTextColor(Color.GREEN);
+
+            dataSets.add(lineDataSet);
         }
 
         LineData lineData = new LineData(dataSets);
         lineChart.setData(lineData);
+        // enable scaling and dragging
+        lineChart.setDragEnabled(true);
+        lineChart.setScaleEnabled(true);
+        lineChart.setDrawGridBackground(false);
+        lineChart.setHighlightPerDragEnabled(true);
 
+        setUpXAxis(lineChart.getXAxis(), mapDateXaxis);
+        setUpYAxis(lineChart.getAxisLeft());
+    }
+
+    private void setUpXAxis(XAxis xAxis, final Map<Integer, Long> mapDateXaxis){
         final Calendar c = Calendar.getInstance();
+        final String format = getStringDateFormat();
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 c.setTimeInMillis(mapDateXaxis.get((int) value));
-                return new SimpleDateFormat("dd/MM/yyyy").format(c.getTime());
+                return new SimpleDateFormat(format).format(c.getTime());
             }
         };
 
-        XAxis xAxis = lineChart.getXAxis();
         xAxis.setGranularity(1f); // é isso que fala quantassve aparece no eixo x
+        xAxis.setAxisLineColor(Color.WHITE);
+        xAxis.setTextColor(Color.WHITE);
+        xAxis.setDrawGridLines(false);
+        xAxis.setAxisLineWidth(2f);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
         xAxis.setValueFormatter(formatter);
+    }
+
+    private void setUpYAxis(YAxis yAxis){
+        yAxis.setDrawGridLines(false);
+        yAxis.setAxisLineColor(Color.WHITE);
+        yAxis.setAxisLineWidth(2f);
+        yAxis.setTextColor(Color.WHITE);
+    }
+
+    private String getStringDateFormat(){
+        int days = getDiferenceDays();
+        if(days < 8){
+            return "EEE";
+        } else if(days < 31){
+            return "dd";
+        } else {
+            return "MM";
+        }
     }
 
     private int getDiferenceDays(){
