@@ -21,8 +21,10 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
@@ -31,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,22 +88,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     void populateChart(Cursor data){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
-        Map<Integer, Long> mapDateXaxis = new HashMap<>();
-        int days = getDiferenceDays();
+        Date historyTime = new Date();
+        Date limitTime = new Date(dateSelected);
 
         while (data.moveToNext()) {
 
             List<Entry> vals = new ArrayList<Entry>();
             String[] history = data.getString(Contract.Quote.POSITION_HISTORY).split("\n");
-            for(int x = 0; x < days; x++){
+            for(int x = 0; historyTime.getTime() > limitTime.getTime(); x++){
                 String s = history[x];
                 String[] val = s.split(",");
                 Log.d(TAG, "val: " + Arrays.toString(val));
                 Entry entry = null;
                 try {
-                    int key = days - (x + 1);
-                    mapDateXaxis.put(key, sdf.parse(val[0]).getTime());
-                    entry = new Entry(key, Float.parseFloat(val[1]));
+                    historyTime = sdf.parse(val[0]);
+                    entry = new Entry(historyTime.getTime(), Float.parseFloat(val[1]));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -126,23 +128,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         lineChart.setDrawGridBackground(false);
         lineChart.setHighlightPerDragEnabled(true);
 
-        setUpXAxis(lineChart.getXAxis(), mapDateXaxis);
+        setUpXAxis(lineChart.getXAxis());
         setUpYAxis(lineChart.getAxisLeft());
     }
 
-    private void setUpXAxis(XAxis xAxis, final Map<Integer, Long> mapDateXaxis){
-        final Calendar c = Calendar.getInstance();
-        final String format = getStringDateFormat();
+    private void setUpXAxis(XAxis xAxis){
         IAxisValueFormatter formatter = new IAxisValueFormatter() {
 
+            private SimpleDateFormat mFormat = new SimpleDateFormat(getStringDateFormat());
+
             @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                c.setTimeInMillis(mapDateXaxis.get((int) value));
-                return new SimpleDateFormat(format).format(c.getTime());
+            public String getFormattedValue(float key, AxisBase axis) {
+                return mFormat.format(new Date((long) key));
             }
         };
 
-        xAxis.setGranularity(1f); // é isso que fala quantassve aparece no eixo x
+        xAxis.setGranularity(1f); // quantas vezes aparece no eixo x
         xAxis.setAxisLineColor(Color.WHITE);
         xAxis.setTextColor(Color.WHITE);
         xAxis.setDrawGridLines(false);
@@ -163,10 +164,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         int days = getDiferenceDays();
         if(days < 8){
             return "EEE";
-        } else if(days < 31){
-            return "dd";
         } else {
-            return "MM";
+            return "dd";
         }
     }
 
@@ -174,7 +173,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(dateSelected);
 
-        long difference =  c.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+        long difference = Calendar.getInstance().getTimeInMillis() - c.getTimeInMillis();
         return (int) (difference/ (1000*60*60*24));
     }
 

@@ -88,7 +88,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         viewPagerAdapter.addFragment(setFragment(Calendar.DATE, 7), getString(R.string.week_title));
-        viewPagerAdapter.addFragment(setFragment(Calendar.MONTH,1), getString(R.string.one_months_title));
+        viewPagerAdapter.addFragment(setFragment(Calendar.MONTH,1), getString(R.string.one_month_title));
         viewPagerAdapter.addFragment(setFragment(Calendar.MONTH, 3), getString(R.string.three_months_title));
 
         chartVP.setAdapter(viewPagerAdapter);
@@ -99,39 +99,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         DetailFragment df = new DetailFragment();
         Bundle bundle = new Bundle();
         Calendar c = Calendar.getInstance();
-        c.add(calendarField, month);
+        c.add(calendarField, -month);
         bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
         df.setArguments(bundle);
 
         return df;
-    }
-
-    private void populateChart(String symbol, Cursor data, LineChart lineChart) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-        while (data.moveToNext()) {
-            List<Entry> vals = new ArrayList<Entry>();
-
-            for (String s : data.getString(Contract.Quote.POSITION_HISTORY).split("\n")) {
-                String[] val = s.split(",");
-                Log.d(TAG, "val: " + Arrays.toString(val));
-                Entry entry = new Entry(sdf.parse(val[0]).getTime(), Float.parseFloat(val[1]));
-                vals.add(entry);
-
-                if(vals.size() == 3)
-                    break;
-            }
-
-            LineDataSet dataSet = new LineDataSet(Lists.reverse(vals), symbol);
-//            dataSet.setColor(white);
-            dataSet.setLineWidth(2f);
-            dataSet.setDrawHighlightIndicators(false);
-//            dataSet.setCircleColor(white);
-//            dataSet.setHighLightColor(white);
-            dataSet.setDrawValues(false);
-            LineData lineData = new LineData(dataSet);
-            lineChart.setData(lineData);
-        }
     }
 
     @Override

@@ -42,7 +42,7 @@
     <string name="title_widget_stock_list">Preview list stock</string>
     <string name="error_message">Error message</string>
     <string name="week_title">Week</string>
-    <string name="one_months_title">1 month</string>
+    <string name="one_month_title">1 month</string>
     <string name="three_months_title">3 months</string>
     <string name="pref_stocks_status_key" translatable="false">stock_status_key</string>
     <string name="add_stock_invalid">Stock symbol add is invalid!</string>
