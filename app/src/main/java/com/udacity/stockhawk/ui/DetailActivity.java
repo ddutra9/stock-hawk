@@ -69,15 +69,15 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         if(savedInstanceState == null){
             symbol = getIntent().getStringExtra(MainActivity.STOCK_SYMBOL);
         } else {
             symbol = savedInstanceState.getString(MainActivity.STOCK_SYMBOL);
         }
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(symbol);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         tabMonths.setupWithViewPager(chartVP, true);
         getSupportLoaderManager().initLoader(STOCK_CHART_LOADER, null, this);
@@ -85,36 +85,25 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     private void setupViewPager() {
-
-        Calendar c = Calendar.getInstance();
-
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        Bundle bundle = new Bundle();
-        DetailFragment monthlyStock = new DetailFragment();
-        c.add(Calendar.DATE, 7);
-        bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
-        monthlyStock.setArguments(bundle);
 
-        DetailFragment weeklyStock = new DetailFragment();
-        bundle = new Bundle();
-        c = Calendar.getInstance();
-        c.add(Calendar.MONTH, 3);
-        bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
-        weeklyStock.setArguments(bundle);
-
-        DetailFragment dailyStock = new DetailFragment();
-        bundle = new Bundle();
-        c = Calendar.getInstance();
-        c.add(Calendar.MONTH, 3);
-        bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
-        dailyStock.setArguments(bundle);
-
-        viewPagerAdapter.addFragment(dailyStock, getString(R.string.week_title));
-        viewPagerAdapter.addFragment(weeklyStock, getString(R.string.six_months_title));
-        viewPagerAdapter.addFragment(monthlyStock, getString(R.string.one_year_title));
+        viewPagerAdapter.addFragment(setFragment(Calendar.DATE, 7), getString(R.string.week_title));
+        viewPagerAdapter.addFragment(setFragment(Calendar.MONTH,1), getString(R.string.one_months_title));
+        viewPagerAdapter.addFragment(setFragment(Calendar.MONTH, 3), getString(R.string.three_months_title));
 
         chartVP.setAdapter(viewPagerAdapter);
         chartVP.setOffscreenPageLimit(2);
+    }
+
+    private DetailFragment setFragment(int calendarField, int month){
+        DetailFragment df = new DetailFragment();
+        Bundle bundle = new Bundle();
+        Calendar c = Calendar.getInstance();
+        c.add(calendarField, month);
+        bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
+        df.setArguments(bundle);
+
+        return df;
     }
 
     private void populateChart(String symbol, Cursor data, LineChart lineChart) throws ParseException {

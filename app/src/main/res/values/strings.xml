@@ -41,17 +41,12 @@
     <string name="toast_no_connectivity">Will refresh when network available.</string>
     <string name="title_widget_stock_list">Preview list stock</string>
     <string name="error_message">Error message</string>
-<<<<<<< HEAD
-    <string name="pref_stocks_status_key">stock_status_key</string>
     <string name="week_title">Week</string>
-    <string name="six_months_title">6 month</string>
-    <string name="one_year_title">1 year</string>
-=======
+    <string name="one_months_title">1 month</string>
+    <string name="three_months_title">3 months</string>
     <string name="pref_stocks_status_key" translatable="false">stock_status_key</string>
-
     <string name="add_stock_invalid">Stock symbol add is invalid!</string>
     <string name="stock_status_server_invalid">No stock information. The server is not returning valid data.</string>
     <string name="stock_status_server_down">No server connection!</string>
->>>>>>> a6d1ba9ef9ab91d11146c10e9b7a6758c4c41620
 
 </resources>
