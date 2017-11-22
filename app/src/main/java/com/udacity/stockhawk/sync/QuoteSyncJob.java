@@ -51,7 +51,7 @@ public final class QuoteSyncJob {
 
     private static final int ONE_OFF_ID = 2;
     public static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
-    private static final int PERIOD = 1800000;
+    private static final int PERIOD = 60 * 60 * 1000;
     private static final int INITIAL_BACKOFF = 10000;
     private static final int PERIODIC_ID = 1;
     private static final int YEARS_OF_HISTORY = 1;
