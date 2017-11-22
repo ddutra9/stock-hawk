@@ -137,6 +137,7 @@ public final class QuoteSyncJob {
                             String body = response.body().string();
                             JSONObject jsonObject = new JSONObject(body);
                             String stockSymbol = call.request().url().pathSegments().get(4).replace(".json", "");
+
                             if(jsonObject.has("dataset")){
                                 ContentValues quotes = processStock(context, jsonObject.getJSONObject("dataset"), stockSymbol);
                                 context.getContentResolver().insert(Contract.Quote.URI,quotes);

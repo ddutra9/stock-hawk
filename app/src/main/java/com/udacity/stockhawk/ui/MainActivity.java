@@ -26,12 +26,10 @@ import android.widget.Toast;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
-import com.udacity.stockhawk.rest.RecyclerTouchListener;
 import com.udacity.stockhawk.sync.QuoteSyncJob;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener,
@@ -89,21 +87,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 getContentResolver().delete(Contract.Quote.makeUriForStock(symbol), null, null);
             }
         }).attachToRecyclerView(stockRecyclerView);
-
-//        stockRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, stockRecyclerView, new RecyclerTouchListener.ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-//                Toast.makeText(MainActivity.this, "Single Click: " + adapter.getSymbolAtPosition(position), Toast.LENGTH_SHORT).show();
-//                Intent i = new Intent(MainActivity.this, DetailActivity.class);
-//                i.putExtra(STOCK_SYMBOL, adapter.getSymbolAtPosition(position));
-//                startActivity(i);
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, int position) {
-//
-//            }
-//        }));
     }
 
     private boolean networkUp() {
