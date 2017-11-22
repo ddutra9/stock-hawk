@@ -48,5 +48,6 @@
     <string name="add_stock_invalid">Stock symbol add is invalid!</string>
     <string name="stock_status_server_invalid">No stock information. The server is not returning valid data.</string>
     <string name="stock_status_server_down">No server connection!</string>
+    <string name="stock_status_server_limit">The request limit has been reached!</string>
 
 </resources>

@@ -246,6 +246,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             case QuoteSyncJob.STOCK_STATUS_SERVER_DOWN:
                 message = getString(R.string.stock_status_server_down);
                 break;
+
+            case QuoteSyncJob.STOCK_STATUS_SERVER_LIMIT:
+                message = getString(R.string.stock_status_server_limit);
+                break;
         }
 
         if(message != null){

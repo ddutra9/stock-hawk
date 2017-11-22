@@ -137,9 +137,13 @@ public final class QuoteSyncJob {
                             String body = response.body().string();
                             JSONObject jsonObject = new JSONObject(body);
                             String stockSymbol = call.request().url().pathSegments().get(4).replace(".json", "");
-                            ContentValues quotes = processStock(context, jsonObject.getJSONObject("dataset"), stockSymbol);
-
-                            context.getContentResolver().insert(Contract.Quote.URI,quotes);
+                            if(jsonObject.has("dataset")){
+                                ContentValues quotes = processStock(context, jsonObject.getJSONObject("dataset"), stockSymbol);
+                                context.getContentResolver().insert(Contract.Quote.URI,quotes);
+                            } else {
+                                context.getContentResolver().notifyChange(Contract.Quote.URI, null);
+                                setStockStatus(context, STOCK_STATUS_SERVER_LIMIT);
+                            }
                         } catch(JSONException ex){
                             Timber.e(ex, "Unknown Error");
                             setStockStatus(context, STOCK_STATUS_SERVER_INVALID);
@@ -207,7 +211,8 @@ public final class QuoteSyncJob {
     }
 
     @Retention(SOURCE)
-    @IntDef({STOCK_STATUS_OK, STOCK_STATUS_SERVER_DOWN, STOCK_STATUS_SERVER_INVALID, STOCK_STATUS_UNKNOWN, STOCK_STATUS_INVALID})
+    @IntDef({STOCK_STATUS_OK, STOCK_STATUS_SERVER_DOWN, STOCK_STATUS_SERVER_INVALID, STOCK_STATUS_UNKNOWN,
+            STOCK_STATUS_INVALID, STOCK_STATUS_SERVER_LIMIT})
     public @interface StockStatus {}
 
     public static final int STOCK_STATUS_OK = 0;
@@ -215,6 +220,7 @@ public final class QuoteSyncJob {
     public static final int STOCK_STATUS_SERVER_INVALID = 2;
     public static final int STOCK_STATUS_UNKNOWN = 3;
     public static final int STOCK_STATUS_INVALID = 4;
+    public static final int STOCK_STATUS_SERVER_LIMIT = 5;
 
     private static void setStockStatus(Context c, @StockStatus int stockStatus){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
