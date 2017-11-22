@@ -1,6 +1,7 @@
 package com.udacity.stockhawk.ui;
 
 import android.database.Cursor;
+import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -27,6 +28,8 @@ import com.google.common.collect.Lists;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,24 +37,23 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+import static com.udacity.stockhawk.R.id.symbol;
+
+public class DetailActivity extends AppCompatActivity {
 
     public static final int STOCK_CHART_LOADER = 0;
     private static final String TAG = DetailActivity.class.getSimpleName();
 
-    public String symbol;
+    private String symbol;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.stock_symbol_tv)
-    TextView stockSymbolTV;
-    @BindView(R.id.stock_price_now_tv)
-    TextView stockPriceNowTV;
     @BindView(R.id.chart_vp)
     ViewPager chartVP;
     @BindView(R.id.tab_months)
@@ -63,18 +65,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-        if(savedInstanceState == null){
-            symbol = getIntent().getStringExtra(MainActivity.STOCK_SYMBOL);
-        } else {
-            symbol = savedInstanceState.getString(MainActivity.STOCK_SYMBOL);
-        }
+        symbol = getIntent().getStringExtra(MainActivity.STOCK_SYMBOL);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(symbol);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         tabMonths.setupWithViewPager(chartVP, true);
-        getSupportLoaderManager().initLoader(STOCK_CHART_LOADER, null, this);
         setupViewPager();
     }
 
@@ -95,36 +92,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         Calendar c = Calendar.getInstance();
         c.add(calendarField, -month);
         bundle.putLong(DetailFragment.SELECTED_TIME_DAY, c.getTimeInMillis());
+        bundle.putString(DetailFragment.SELECTED_SYMBOL, symbol);
         df.setArguments(bundle);
 
         return df;
     }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,
-                Contract.Quote.makeUriForStock(symbol),
-                Contract.Quote.QUOTE_COLUMNS,
-                null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data.moveToFirst()) {
-            String symbol = data.getString(Contract.Quote.POSITION_SYMBOL);
-            Float price = data.getFloat(Contract.Quote.POSITION_PRICE);
-            Float absoluteChange = data.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
-
-
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
-
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
 

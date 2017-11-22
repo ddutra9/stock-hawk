@@ -1,8 +1,10 @@
 package com.udacity.stockhawk.ui;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -47,6 +49,7 @@ import butterknife.ButterKnife;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static String SELECTED_TIME_DAY = "SELECTED_TIME_DAY";
+    public static String SELECTED_SYMBOL = "SELECTED_SYMBOL";
 
     private Long dateSelected;
     private String symbol;
@@ -61,13 +64,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, rootView);
 
-        DetailActivity detailActivity = (DetailActivity) getActivity();
-
-        if (savedInstanceState == null) {
-            dateSelected = getArguments().getLong(SELECTED_TIME_DAY);
-            symbol = detailActivity.symbol;
-        }
-        getLoaderManager().initLoader(DetailActivity.STOCK_CHART_LOADER, null, this);
+        dateSelected = getArguments().getLong(SELECTED_TIME_DAY);
+        symbol = getArguments().getString(SELECTED_SYMBOL);
 
         return rootView;
     }
@@ -83,6 +81,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         populateChart(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     void populateChart(Cursor data){
@@ -130,6 +133,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         setUpXAxis(lineChart.getXAxis());
         setUpYAxis(lineChart.getAxisLeft());
+
+        lineChart.invalidate(); // refresh
     }
 
     private void setUpXAxis(XAxis xAxis){
@@ -160,6 +165,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         yAxis.setTextColor(Color.WHITE);
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DetailActivity.STOCK_CHART_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
     private String getStringDateFormat(){
         int days = getDiferenceDays();
         if(days < 8){
@@ -178,7 +189,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        lineChart.invalidate(); // refresh
+    public void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(DetailActivity.STOCK_CHART_LOADER, null, this);
     }
 }

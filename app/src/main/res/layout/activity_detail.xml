@@ -23,25 +23,6 @@
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         </android.support.v7.widget.Toolbar>
 
-        <android.support.v7.widget.GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:columnCount="3">
-
-            <TextView
-                android:id="@+id/stock_symbol_tv" />
-
-            <android.support.v4.widget.Space
-                android:layout_height="0dp"
-                android:layout_marginBottom="16dp"
-                app:layout_columnSpan="3"
-                app:layout_columnWeight="1"/>
-
-            <TextView
-                android:id="@+id/stock_price_now_tv"/>
-
-        </android.support.v7.widget.GridLayout>
-
         <android.support.design.widget.TabLayout
             android:id="@+id/tab_months"
             android:layout_width="match_parent"
