@@ -49,5 +49,9 @@
     <string name="stock_status_server_invalid">No stock information. The server is not returning valid data.</string>
     <string name="stock_status_server_down">No server connection!</string>
     <string name="stock_status_server_limit">The request limit has been reached!</string>
+    <string name="stock_status_unknow">Unkow stock status!</string>
+    <string name="symbol_GOOG">GOOG</string>
+    <string name="stock_price">1000.00</string>
+    <string name="stock_change">100%</string>
 
 </resources>

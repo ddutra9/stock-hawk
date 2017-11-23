@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void updateErrorView() {
         @QuoteSyncJob.StockStatus int status = QuoteSyncJob.getStockStatus(this);
 
-        String message = null;
+        String message = getString(R.string.stock_status_unknow);
         switch (status) {
             case QuoteSyncJob.STOCK_STATUS_INVALID:
                 message = getString(R.string.add_stock_invalid);

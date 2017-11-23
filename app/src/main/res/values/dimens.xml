@@ -2,4 +2,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="widget_stock_default_height">240dp</dimen>
     <dimen name="widget_stock_default_width">300dp</dimen>
+
+    <dimen name="horizontal_padding">16dp</dimen>
+    <dimen name="list_item_horizontal_padding">3dp</dimen>
 </resources>
