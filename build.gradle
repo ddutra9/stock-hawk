@@ -17,3 +17,8 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    supportLibVersion = '25.3.0'
+    jakewhartonVersin = '8.8.0'
+}

@@ -6,8 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingLeft="@dimen/horizontal_padding"
-    android:paddingRight="@dimen/horizontal_padding"
     android:paddingStart="@dimen/horizontal_padding"
     android:paddingEnd="@dimen/horizontal_padding"
     android:id="@+id/list_item_quote">
@@ -40,8 +38,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/percent_change_pill_green"
-            android:paddingLeft="@dimen/list_item_horizontal_padding"
-            android:paddingRight="@dimen/list_item_horizontal_padding"
             android:paddingStart="@dimen/list_item_horizontal_padding"
             android:paddingEnd="@dimen/list_item_horizontal_padding"
             tools:text="@string/stock_change" />

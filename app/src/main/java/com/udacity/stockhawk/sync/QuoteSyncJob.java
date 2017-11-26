@@ -145,7 +145,7 @@ public final class QuoteSyncJob {
                                 context.getContentResolver().notifyChange(Contract.Quote.URI, null);
                                 setStockStatus(context, STOCK_STATUS_SERVER_LIMIT);
                             }
-                        } catch(JSONException ex){
+                        } catch(Exception ex){
                             Timber.e(ex, "Unknown Error");
                             setStockStatus(context, STOCK_STATUS_SERVER_INVALID);
                         }
